@@ -6,7 +6,14 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Text.ExtensibleTemplate
+                     , Text.ExtensibleTemplate.Extension
+                     , Text.ExtensibleTemplate.Internal.Parser
+                     , Text.ExtensibleTemplate.Interpreter
+                     , Text.ExtensibleTemplate.Param
   build-depends:       base >= 4.7 && < 5
+                     , mtl == 2.2.*
+                     , parsec == 3.1.*
+                     , transformers == 0.5.*
   ghc-options:         -Wall -Werror
   default-language:    Haskell2010
 
@@ -14,8 +21,11 @@ test-suite extensible-template-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       Text.ExtensibleTemplate.Internal.ParserSpec
+                     , Text.ExtensibleTemplate.InterpreterSpec
   build-depends:       base
                      , hspec == 2.*
                      , extensible-template
+                     , mtl == 2.2.*
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
   default-language:    Haskell2010
