@@ -5,6 +5,7 @@ module Text.ExtensibleTemplate.Interpreter
   , RunExtensions
   ) where
 
+import Control.Arrow
 import Control.Monad.Trans.Except
 import Text.ExtensibleTemplate.Extension
 import Text.ExtensibleTemplate.Internal.Parser
@@ -29,12 +30,12 @@ runTemplate extensions template = runExceptT $ do
   return $ concat plainStrings
 
 applyExtension :: (Monad m, Monad n) => Extension m n -> Component -> ExceptT String n Component
-applyExtension _ c@(TextComponent _) = return c
-applyExtension (Extension acceptor function _) c@(FunctionComponent name params) =
+applyExtension _ c@(TextComponent _ _) = return c
+applyExtension (Extension acceptor function _) c@(FunctionComponent pos name params) =
   if acceptor name
-  then TextComponent <$> ExceptT (function name params)
+  then TextComponent pos <$> ExceptT (left (\s -> show pos ++ ":\n" ++ s) <$> function name params)
   else return c
 
 componentToEither :: Component -> Either String String
-componentToEither (TextComponent text) = Right text
-componentToEither (FunctionComponent name _) = Left $ "extension undefined: " ++ name
+componentToEither (TextComponent _ text) = Right text
+componentToEither (FunctionComponent pos name _) = Left $ show pos ++ ":\nextension undefined: " ++ name
