@@ -27,10 +27,18 @@ counterExtension = counterExtensionGen
 counterExtensionIO :: Extension IO (State (Map Param Int))
 counterExtensionIO = counterExtensionGen
 
--- | an extension to embed auto increment counters
---
--- @
--- @
+{- |
+an extension to embed auto increment counters.
+
+@
+{ counter "section" }. Aaa
+  { counter "section-1" }. Aaa-xxx
+  { counter "section-1" }. Aaa-yyy
+{ counter "section" }. Bbb
+  { counter "section-2" }. Bbb-xxx
+  { counter "section-2" }. Bbb-yyy
+@
+-}
 counterExtensionGen :: Monad m => Extension m (State (Map Param Int))
 counterExtensionGen = Extension
   { extensionAcceptor = (== name)
@@ -52,6 +60,13 @@ valueExtension = valueExtensionGen
 valueExtensionIO :: Map String String -> ExtensionIO Identity
 valueExtensionIO = valueExtensionGen
 
+{- |
+an extension to access values defined in a client program.
+
+@
+runTemplate (valueExtension (fromList [("a", "str1"), ("b", "str2")]) <|< ENil) "{ value \"a\" }{ value \"b\" }"
+@
+-}
 valueExtensionGen :: Monad m => Map String String -> Extension m Identity
 valueExtensionGen table = Extension
   { extensionAcceptor = (== name)
@@ -66,6 +81,13 @@ valueExtensionGen table = Extension
 includeExtensionIO :: FilePath -> ExtensionIO IO
 includeExtensionIO = includeExtensionGen
 
+{- |
+an extension to include files in the specified base directory.
+
+@
+{ include "file.txt" }
+@
+-}
 includeExtensionGen :: MonadIO m => FilePath -> Extension m IO
 includeExtensionGen basedir = Extension
   { extensionAcceptor = (== name)
