@@ -19,7 +19,7 @@ main = do
   template <- readFile "template"
   let result = runIdentity $ runTemplate extensions template
   
-  putStrLn $ either id id result
+  either (hPutStrLn stderr) putStrLn result
 ```
 
 
@@ -41,7 +41,7 @@ main = do
   let template = "{ const }"
   let result = runIdentity $ runTemplate extensions template
 
-  putStrLn $ either id id result  -- "abc"
+  either (hPutStrLn stderr) putStrLn result  -- "abc"
 ```
 
 The following program is an example for defining an extension that sum up arguments.
@@ -66,7 +66,7 @@ main = do
   let template = "{ sum 1 2 3 4 5 }"
   let result = runIdentity $ runTemplate extensions template
 
-  putStrLn $ either id id result  -- "15"
+  either (hPutStrLn stderr) putStrLn result  -- "15"
 ```
 
 More examples are available in [BasicExtensions.hs](src/ExtensibleTemplate/BasicExtensions.hs).
