@@ -1,29 +1,35 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes, MultiParamTypeClasses, FlexibleInstances #-}
 
 module Text.ExtensibleTemplate.Extension
   ( Extension(..)
+  , ExtensionIO
+  , ExtensionId
   , ExtensionList
   , ENil(..)
   , ECons(..)
   , (<|<)
   ) where
 
+import Control.Monad.Identity
 import Text.ExtensibleTemplate.Param
 
-data Extension m = Extension
+data Extension m n = Extension
   { extensionAcceptor :: String -> Bool
-  , extensionFunction :: String -> [Param] -> m (Either String String)
-  , extensionRunner :: forall a. m a -> IO a
+  , extensionFunction :: String -> [Param] -> n (Either String String)
+  , extensionRunner :: forall a. n a -> m a
   }
 
-class ExtensionList l
+type ExtensionIO = Extension IO
+type ExtensionId = Extension Identity
+
+class Monad m => ExtensionList m l
 
 data ENil = ENil
-instance ExtensionList ENil
+instance Monad m => ExtensionList m ENil
 
-data ECons m l = ECons (Extension m) l
-instance (ExtensionList t, Monad m) => ExtensionList (ECons m t)
+data ECons m n l = ECons (Extension m n) l
+instance (ExtensionList m t, Monad m, Monad n) => ExtensionList m (ECons m n t)
 
 infixr 5 <|<
-(<|<) :: ExtensionList l => Extension m -> l -> ECons m l
+(<|<) :: ExtensionList m l => Extension m n -> l -> ECons m n l
 (<|<) = ECons
