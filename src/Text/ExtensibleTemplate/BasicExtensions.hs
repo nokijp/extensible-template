@@ -27,6 +27,10 @@ counterExtension = counterExtensionGen
 counterExtensionIO :: Extension IO (State (Map Param Int))
 counterExtensionIO = counterExtensionGen
 
+-- | an extension to embed auto increment counters
+--
+-- @
+-- @
 counterExtensionGen :: Monad m => Extension m (State (Map Param Int))
 counterExtensionGen = Extension
   { extensionAcceptor = (== name)

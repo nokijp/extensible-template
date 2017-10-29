@@ -20,6 +20,7 @@ instance (RunExtensions m t, Monad m, Monad n) => RunExtensions m (ECons m n t) 
     step <- ExceptT $ runner $ runExceptT $ mapM (applyExtension e) components
     runExtensions t step
 
+-- | converts a template into a string, using the specified extensions
 runTemplate :: (RunExtensions m l, Monad m) => l -> String -> m (Either String String)
 runTemplate extensions template = runExceptT $ do
   components <- ExceptT $ return $ parseComponents template
